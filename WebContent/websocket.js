@@ -6,13 +6,12 @@ webSocket.onopen = function() {
 };
 
 webSocket.onmessage = function (message) {
-	console.log("Server: "+message.data)
+	addMessageOnScreen(message.data);
 };
 
 
 const handlerOnclick = () => {
 	const input = document.getElementById("input");
-	console.log(input.value)
 	webSocket.send(input.value);
 	addMessageOnScreen(input.value);
 	input.value = "";

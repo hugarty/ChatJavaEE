@@ -3,6 +3,7 @@ package websocketchat;
 import java.io.IOException;
 
 import javax.websocket.OnClose;
+import javax.websocket.OnError;
 import javax.websocket.OnMessage;
 import javax.websocket.OnOpen;
 import javax.websocket.Session;
@@ -14,12 +15,16 @@ public class testando {
 	
 	@OnOpen
 	public void entrouAlguem(Session session) {
-		System.out.println("OI");
+		System.out.println("oi " + session.getId());
 		try {
-			session.getBasicRemote().sendText("OI");
+			for(Session s: session.getOpenSessions()) {
+				if(s != session)
+					s.getBasicRemote().sendText("Server: Mais alguém entrou na sala");
+			}
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
+		
 	}
 	
 	@OnClose
@@ -29,13 +34,28 @@ public class testando {
 	
 	@OnMessage
 	public void recebeuMensagem(String message, Session session) {
-		try {
-			for(Session s: session.getOpenSessions()) {				
-				s.getBasicRemote().sendText(message);
+		if(verificaMensagem(message)) {
+			try {
+				for(Session s: session.getOpenSessions()) {
+					if(s != session)
+						s.getBasicRemote().sendText(message);
+				}
+			} catch (IOException e) {
+				throw new RuntimeException(e);
 			}
-		} catch (IOException e) {
-			throw new RuntimeException(e);
 		}
+	}
+	
+	@OnError
+	public void ocorreuErro(Throwable e) {
+		e.printStackTrace();
+	}
+	
+	private boolean verificaMensagem(String message) {
+		if(message.isBlank())
+			return false;
+		
+		return true;
 	}
 }
 

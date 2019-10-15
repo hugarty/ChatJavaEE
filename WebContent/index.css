@@ -1,0 +1,4 @@
+#mensagens{
+	display: flex;
+	flex-direction:column;
+}

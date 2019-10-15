@@ -1,15 +1,20 @@
 <!DOCTYPE html>
 <html xmlns="http://www.w3c.org/1999/xhtml"
     xmlns:h="http://xmlns.jcp.org/jsf/html">
-<h:head></h:head>
+<h:head>
+	<link rel="stylesheet" href="index.css"/>
+</h:head>
 <h:body>
 	<script src="websocket.js"></script>
+	<div>
+        <h:inputText id="nick" value="seuNick"/>
+    </div>
     <div>
-        <h:inputText id="input" />
+        <h:inputText id="input"/>
         <button id="botão" onclick="handlerOnclick()">Enviar</button>
     </div>
     <div id="mensagens">
-    	<span>Respostas</span>
+    	<h4>Respostas</h4>
     </div>
 </h:body>
 </html>
