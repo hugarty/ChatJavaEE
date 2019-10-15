@@ -3,14 +3,30 @@
     xmlns:h="http://xmlns.jcp.org/jsf/html">
 <h:head></h:head>
 <h:body>
-    oi tchau, eae
-    
-<script>
-    var webSocket = new WebSocket("ws://localhost:8080/websocketchat/ooooi");
+	<script>
+	    const handlerOnclick = () => {
+	    	const input = document.getElementById("input");
+	    	console.log(input.value)
+	    	webSocket.send(input.value);
+	    	input.value = "";
+	    }
+	</script>
+    <div>
+        <h:inputText id="input" />
 
-    webSocket.onopen = function() {
-        console.log("connection opened");
-    };
-</script>
+        <button id="botão" onclick="handlerOnclick()">Enviar</button>
+    </div>
+	<script>
+	    var webSocket = new WebSocket("ws://localhost:8080/websocketchat/chat");
+	    
+	    webSocket.onopen = function() {
+	        console.log("connection opened");
+	    };
+	    
+	    webSocket.onmessage = function (message) {
+	    	console.log("Server: "+message.data)
+	    };
+	    
+	</script>
 </h:body>
 </html>
