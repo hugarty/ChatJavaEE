@@ -30,7 +30,9 @@ public class testando {
 	@OnMessage
 	public void recebeuMensagem(String message, Session session) {
 		try {
-			session.getBasicRemote().sendText(message);
+			for(Session s: session.getOpenSessions()) {				
+				s.getBasicRemote().sendText(message);
+			}
 		} catch (IOException e) {
 			throw new RuntimeException(e);
 		}
