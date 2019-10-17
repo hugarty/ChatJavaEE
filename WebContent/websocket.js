@@ -12,7 +12,8 @@ webSocket.onmessage = function (message) {
 
 const handlerOnclick = () => {
 	const input = document.getElementById("input");
-	webSocket.send(input.value);
+	const nick = document.getElementById("nick");
+	webSocket.send(`${nick.value}:${input.value}`);
 	addMessageOnScreen(input.value);
 	input.value = "";
 }
