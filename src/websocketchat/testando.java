@@ -1,8 +1,10 @@
 package websocketchat;
 
 import java.io.IOException;
+import java.io.Serializable;
 import java.util.HashMap;
 
+import javax.websocket.ClientEndpoint;
 import javax.websocket.OnClose;
 import javax.websocket.OnError;
 import javax.websocket.OnMessage;
@@ -12,8 +14,8 @@ import javax.websocket.server.ServerEndpoint;
 
 
 @ServerEndpoint("/chat")
-public class testando {
-
+public class testando implements Serializable{
+	private static final long serialVersionUID = 8566939988530771311L;
 	HashMap<Session, String> usuarios = new HashMap<>();
 	
 	@OnOpen
@@ -61,7 +63,7 @@ public class testando {
 	}
 	
 	private boolean verificaMensagem(String message) {
-		if(message.isBlank())
+		if(message.isEmpty())
 			return false;
 		
 		return true;
