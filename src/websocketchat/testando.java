@@ -5,6 +5,10 @@ import java.io.Serializable;
 import java.util.HashMap;
 
 import javax.websocket.ClientEndpoint;
+import javax.websocket.CloseReason;
+import javax.websocket.Endpoint;
+import javax.websocket.EndpointConfig;
+import javax.websocket.MessageHandler;
 import javax.websocket.OnClose;
 import javax.websocket.OnError;
 import javax.websocket.OnMessage;
@@ -12,15 +16,20 @@ import javax.websocket.OnOpen;
 import javax.websocket.Session;
 import javax.websocket.server.ServerEndpoint;
 
-
 @ServerEndpoint("/chat")
-public class testando implements Serializable{
+public class testando extends Endpoint {
 	private static final long serialVersionUID = 8566939988530771311L;
 	HashMap<Session, String> usuarios = new HashMap<>();
-	
-	@OnOpen
-	public void entrouAlguem(Session session) {
+
+	@Override
+	public void onOpen(Session session, EndpointConfig config) {
 		System.out.println("oi " + session.getId());
+		session.addMessageHandler(new MessageHandler.Whole<String>() {
+			@Override
+			public void onMessage(String message) {
+				recebeuMensagem(message, session);
+			}
+		});
 		usuarios.put(session, "");
 		try {
 			for(Session s: session.getOpenSessions()) {
@@ -32,47 +41,26 @@ public class testando implements Serializable{
 		}
 	}
 	
-	@OnClose
-	public void saiuAlguem(Session session) {
+	@Override
+	public void onClose(Session session, CloseReason closeReason) {
 		System.out.println(usuarios.get(session) + " Saiu");
 		usuarios.remove(session);
 	}
 	
-	@OnMessage
 	public void recebeuMensagem(String message, Session session) {
-		if(verificaMensagem(message)) {
-			String nick = getNick(message);
-			if(usuarios.get(session) != nick){
-				usuarios.replace(session, nick);
+		try {
+			for(Session s: session.getOpenSessions()) {
+				if(s != session)
+					s.getBasicRemote().sendText(message);
 			}
-			try {
-				for(Session s: session.getOpenSessions()) {
-					s.getBasicRemote().sendText(usuarios.get(session) + " -> " + nick);
-					if(s != session)
-						s.getBasicRemote().sendText(message);
-				}
-			} catch (IOException e) {
-				throw new RuntimeException(e);
-			}
+		} catch (IOException e) {
+			throw new RuntimeException(e);
 		}
 	}
 	
-	@OnError
-	public void ocorreuErro(Throwable e) {
-		e.printStackTrace();
-	}
-	
-	private boolean verificaMensagem(String message) {
-		if(message.isEmpty())
-			return false;
-		
-		return true;
-	}
-
-	private String getNick (String message){
-		if(message.contains(":"))
-			return message.split(":")[0];
-		return "";
+	@Override
+	public void onError(Session session, Throwable thr) {
+		super.onError(session, thr);
 	}
 }
 
