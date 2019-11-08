@@ -1,14 +1,13 @@
 
-var webSocket = new WebSocket("ws://localhost:8080/websocketchat/chat");
+var webSocket = new WebSocket(`ws://localhost:8080/websocketchat/${websocketPath}`);
 	    
 webSocket.onopen = function() {
-    console.log("connection opened");
+    console.log("connection openee");
 };
 
 webSocket.onmessage = function (message) {
 	addMessageOnScreen(message.data);
 };
-
 
 const handlerOnclick = () => {
 	const input = document.getElementById("input");

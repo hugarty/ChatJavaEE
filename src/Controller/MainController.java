@@ -15,23 +15,23 @@ import javax.websocket.Endpoint;
 import javax.websocket.server.ServerContainer;
 import javax.websocket.server.ServerEndpointConfig;
 
+import websocketchat.WebsocketManager;
 import websocketchat.testando;
 
 @Named("main")
-@Singleton
 public class MainController implements Serializable {
 
 	private static final long serialVersionUID = -4814970080266121815L;
 	
 	@Inject
-	ServletContext servletContext;
+	WebsocketManager websocketManager;
 	
-	List<Endpoint> lista = new ArrayList<Endpoint>();
-	
-	public void novoWebSocket() throws DeploymentException, IOException, URISyntaxException{
-		ServerEndpointConfig build = ServerEndpointConfig.Builder.create(testando.class, "/oi").build();
-		ServerContainer serverContainer = (ServerContainer)servletContext.getAttribute("javax.websocket.server.ServerContainer");
-		System.out.println("Rodou tudo: "+serverContainer.toString());
-		serverContainer.addEndpoint(build);
+	public String novoWebSocket() throws DeploymentException, IOException, URISyntaxException{
+		String endpointName = websocketManager.buildNewWebsocketServer();
+		if(endpointName != null) {
+			return "index?faces-redirect=true&x="+endpointName ;			
+		}
+		return "index?faces-redirect=true";
 	}
+	
 }
