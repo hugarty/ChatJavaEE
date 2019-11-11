@@ -16,7 +16,7 @@ import javax.websocket.server.ServerContainer;
 import javax.websocket.server.ServerEndpointConfig;
 
 import websocketchat.WebsocketManager;
-import websocketchat.testando;
+import websocketchat.WebsocketProgrammaticEndpoint;
 
 @Named("main")
 public class MainController implements Serializable {

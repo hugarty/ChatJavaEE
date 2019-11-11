@@ -19,29 +19,21 @@ import javax.websocket.Session;
 import javax.websocket.server.ServerEndpoint;
 
 
-public class testando extends Endpoint {
+public class WebsocketProgrammaticEndpoint extends Endpoint {
 	private static final long serialVersionUID = 8566939988530771311L;
-	HashMap<Session, String> usuarios = new HashMap<>();
-	
+	HashMap<Session, String> usuarios = new HashMap<>(); 
 	
 	@Override
 	public void onOpen(Session session, EndpointConfig config) {
-		System.out.println(session.getRequestURI().toString()+": Nova conexão: " + session.getId());
+		System.out.println(session.getRequestURI().toString()+" - Nova conexão estabelecida: " + session.getId());
 		session.addMessageHandler(new MessageHandler.Whole<String>() {
 			@Override
 			public void onMessage(String message) {
-				recebeuMensagem(message, session);
+				handleMessage(message, session);
 			}
 		});
-		usuarios.put(session, "");
-		try {
-			for(Session s: session.getOpenSessions()) {
-				if(s != session)
-					s.getBasicRemote().sendText("Server: Mais alguém entrou na sala");
-			}
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
+		usuarios.put(session, "anônimo");
+		sendMessageToOtherSessions("Server: Mais alguém entrou na sala", session);
 	}
 	
 	@Override
@@ -49,17 +41,40 @@ public class testando extends Endpoint {
 		System.out.println(usuarios.get(session) + " Saiu "+session.getId());
 		usuarios.remove(session);
 		if(usuarios.size() < 1) {			
-			enableEndpointName(session.getRequestURI().toString());
+			enableWebsocketEndpointName(session.getRequestURI().toString());
 		}
 	}
 	
-	private void enableEndpointName(String fullPath) {
+	private void enableWebsocketEndpointName(String fullPath) {
 		System.out.println("sem usuários");
 		String endpoindName = fullPath.substring(fullPath.lastIndexOf("/")+1); 
 		WebsocketManager.addAbleEndpointName(endpoindName);
 	}
 	
-	public void recebeuMensagem(String message, Session session) {
+	public void handleMessage(String message, Session session) {
+		message = checkNickWasChanged(message, session);
+		sendMessageToOtherSessions(message, session);
+	}
+	
+	private String checkNickWasChanged(String message, Session session) {
+		String nick = getNickOnMessage(message);
+		if(!usuarios.get(session).equals(nick)) {
+			sendMessageToOtherSessions(usuarios.get(session)+" trocou de nick para -> "+ nick, session);
+			usuarios.replace(session, nick);
+ 		}
+		return message;
+	}
+	private String getNickOnMessage(String message) {
+		try {
+			String nick = (String)message.subSequence(0, message.indexOf(":"));
+			return nick;
+		}
+		catch(StringIndexOutOfBoundsException e) {
+			return "anônimo";
+		}
+	}
+	
+	private void sendMessageToOtherSessions (String message, Session session) {
 		try {
 			for(Session s: session.getOpenSessions()) {
 				if(s != session)

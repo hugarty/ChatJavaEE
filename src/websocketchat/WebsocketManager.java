@@ -40,7 +40,7 @@ public class WebsocketManager implements Serializable{
 		String websocketServerEndpoint = getNewWebsocketEndpointName();
 		ServerEndpointConfig build = ServerEndpointConfig
 				.Builder
-				.create(testando.class, "/"+websocketServerEndpoint )
+				.create(WebsocketProgrammaticEndpoint.class, "/"+websocketServerEndpoint )
 				.build();
 		try {
 			ServerContainer serverContainer = getServerContainer();
