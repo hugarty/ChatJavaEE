@@ -27,7 +27,7 @@ public class MainController implements Serializable {
 	WebsocketManager websocketManager;
 	
 	public String novoWebSocket() throws DeploymentException, IOException, URISyntaxException{
-		String endpointName = websocketManager.buildNewWebsocketServer();
+		String endpointName = websocketManager.getAWebsocketServerEndpoint();
 		if(endpointName != null) {
 			return "index?faces-redirect=true&x="+endpointName ;			
 		}
